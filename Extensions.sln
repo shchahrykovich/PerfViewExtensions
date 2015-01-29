@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
 VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Reporting", "ReportingSrc\Reporting.csproj", "{1BD2D8E1-0720-4806-A44E-5580CB20A552}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Reporting", "Reporting\Reporting.csproj", "{1BD2D8E1-0720-4806-A44E-5580CB20A552}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReportingSrc.Tests", "ReportingSrc.Tests\ReportingSrc.Tests.csproj", "{EE7FE609-42C6-43B8-9215-4130A1E6B95A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Reporting.Tests", "Reporting.Tests\Reporting.Tests.csproj", "{EE7FE609-42C6-43B8-9215-4130A1E6B95A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
