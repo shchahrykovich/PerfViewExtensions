@@ -50,6 +50,10 @@
     <Reference Include="CsvReader">
       <HintPath>..\packages\PerfViewExtensionsLibrary.1.7.0.1\lib\net40\CsvReader.dll</HintPath>
     </Reference>
+    <Reference Include="DocumentFormat.OpenXml, Version=2.5.5631.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <Private>True</Private>
+      <HintPath>..\packages\DocumentFormat.OpenXml.2.5\lib\DocumentFormat.OpenXml.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.Diagnostics.FastSerialization">
       <HintPath>..\packages\PerfViewExtensionsLibrary.1.7.0.1\lib\net40\Microsoft.Diagnostics.FastSerialization.dll</HintPath>
     </Reference>
@@ -67,6 +71,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Commands.cs" />
+    <Compile Include="DiffExtractor\DiffExtractor.cs" />
+    <Compile Include="DiffExtractor\DiffExtractorArguments.cs" />
+    <Compile Include="DiffExtractor\Entities\DataRecord.cs" />
+    <Compile Include="DiffExtractor\Entities\Diff.cs" />
+    <Compile Include="DiffExtractor\Entities\ProcessData.cs" />
+    <Compile Include="DiffExtractor\Entities\ReportRecord.cs" />
+    <Compile Include="DiffExtractor\Entities\ThreadData.cs" />
+    <Compile Include="ExcelExporter\XlsxExporter.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -78,7 +90,8 @@
   </PropertyGroup>
   <PropertyGroup>
     <PostBuildEvent>xcopy /y "$(TargetPath)" "$(ProjectDir).." &amp;
-xcopy /y "$(ProjectDir)$(OutDir)$(TargetName).xml" "$(ProjectDir).." 
+xcopy /y "$(ProjectDir)$(OutDir)$(TargetName).xml" "$(ProjectDir).." &amp;
+xcopy /y "$(ProjectDir)$(OutDir)DocumentFormat.OpenXml.dll" "$(ProjectDir).."
 </PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
