@@ -7,6 +7,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{1BD2D8E1-0720-4806-A44E-5580CB20A552}</ProjectGuid>
     <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Reporting</RootNamespace>
     <AssemblyName>Reporting</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
@@ -71,14 +72,19 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Commands.cs" />
-    <Compile Include="DiffExtractor\DiffExtractor.cs" />
-    <Compile Include="DiffExtractor\DiffExtractorArguments.cs" />
-    <Compile Include="DiffExtractor\Entities\DataRecord.cs" />
-    <Compile Include="DiffExtractor\Entities\Diff.cs" />
-    <Compile Include="DiffExtractor\Entities\ProcessData.cs" />
-    <Compile Include="DiffExtractor\Entities\ReportRecord.cs" />
-    <Compile Include="DiffExtractor\Entities\ThreadData.cs" />
-    <Compile Include="ExcelExporter\XlsxExporter.cs" />
+    <Compile Include="Implementations\DiffExtractor.cs" />
+    <Compile Include="Implementations\DiffExtractorArguments.cs" />
+    <Compile Include="Implementations\Entities\DataRecord.cs" />
+    <Compile Include="Implementations\Entities\Diff.cs" />
+    <Compile Include="Implementations\Entities\ProcessData.cs" />
+    <Compile Include="Implementations\Entities\ReportRecord.cs" />
+    <Compile Include="Implementations\Entities\ThreadData.cs" />
+    <Compile Include="Export\IExporter.cs" />
+    <Compile Include="Export\XlsxExporter.cs" />
+    <Compile Include="Export\XlsxExporter2.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Reporting.DiffExtractor.Entities
+namespace Reporting.Implementations.Entities
 {
     internal class ThreadData
     {

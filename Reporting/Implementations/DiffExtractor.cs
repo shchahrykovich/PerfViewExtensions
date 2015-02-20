@@ -1,25 +1,30 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Diagnostics.Tracing;
-using Microsoft.Diagnostics.Tracing.Etlx;
-using Reporting.DiffExtractor.Entities;
-using Reporting.ExcelExporter;
+using Reporting.Export;
+using Reporting.Implementations.Entities;
 
-namespace Reporting.DiffExtractor
+namespace Reporting.Implementations
 {
     internal class DiffExtractor
     {
+        private readonly IExporter _exporter;
         private readonly Dictionary<int, ProcessData> _data = new Dictionary<int, ProcessData>();
 
-        public void ExtractEvents(TraceEvents events, DiffExtractorArguments arguments)
+        public DiffExtractor(IExporter exporter)
+        {
+            _exporter = exporter;
+        }
+
+        public void ExtractEvents(IEnumerable<TraceEvent> events, DiffExtractorArguments arguments)
         {
             FindEvents(events, arguments.ProviderName, arguments.StartEvent, arguments.StopEvent);
             var diffs = FindDiffs();
 
-            XlsxExporter.WriteReport(arguments.OutputReport, diffs);
+            _exporter.Export(arguments.OutputReport, diffs);
         }
 
-        private void FindEvents(TraceEvents events, string providerName, string startEvent, string stopEvent)
+        private void FindEvents(IEnumerable<TraceEvent> events, string providerName, string startEvent, string stopEvent)
         {
             foreach (TraceEvent traceEvent in events)
             {

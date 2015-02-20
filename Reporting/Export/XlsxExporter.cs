@@ -2,14 +2,12 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
-using Reporting.DiffExtractor;
-using Reporting.DiffExtractor.Entities;
+using Reporting.Implementations.Entities;
 
-namespace Reporting.ExcelExporter
+namespace Reporting.Export
 {
     internal static class XlsxExporter
     {

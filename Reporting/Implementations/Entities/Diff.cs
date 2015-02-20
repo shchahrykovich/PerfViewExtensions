@@ -1,4 +1,4 @@
-﻿namespace Reporting.DiffExtractor.Entities
+﻿namespace Reporting.Implementations.Entities
 {
     internal class Diff
     {

@@ -1,4 +1,4 @@
-﻿namespace Reporting.DiffExtractor
+﻿namespace Reporting.Implementations
 {
     internal class DiffExtractorArguments
     {
