@@ -19,7 +19,7 @@ namespace Reporting
         public void ExtractDiffs(string etlFileName, string providerName, string startEvent, string stopEvent, string outputReport = "report.xlsx")
         {
             DiffExtractor extractor = new DiffExtractor(new XlsxExporter2());
-            using (var etlFile = OpenETLFile(etlFileName))
+            using (ETLDataFile etlFile = OpenETLFile(etlFileName))
             {
                 DiffExtractorArguments arguments = new DiffExtractorArguments
                 {

@@ -1,11 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using Microsoft.Diagnostics.Tracing;
+using System.IO;
 using Microsoft.Diagnostics.Tracing.Etlx;
 using NUnit.Framework;
-using PerfViewExtensibility;
 using Reporting.Implementations;
 using Reporting.Tests.Fakes;
+using Reporting.Tests.Resources;
 
 namespace Reporting.Tests.Implementations
 {
@@ -14,22 +13,27 @@ namespace Reporting.Tests.Implementations
     {
         private DiffExtractor _extractor;
         private FakeExporter _exporter;
-        private ETLDataFile _file;
+        private string _etlFilePath;
 
         [SetUp]
         public void Setup()
         {
             _exporter = new FakeExporter();
             _extractor = new DiffExtractor(_exporter);
-            _file = new ETLDataFile("PerfViewData.etl.zip");
+
+            _etlFilePath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("N") + ".etl");
+            File.WriteAllBytes(_etlFilePath, Files.PerfViewData);
         }
 
         [TearDown]
         public void TearDown()
         {
-            if (null != _file)
+            if (!String.IsNullOrEmpty(_etlFilePath))
             {
-                _file.Dispose();
+                if (File.Exists(_etlFilePath))
+                {
+                    File.Delete(_etlFilePath);
+                }
             }
         }
 
@@ -37,11 +41,10 @@ namespace Reporting.Tests.Implementations
         public void Should_Not_Extract_Events_When_Provider_Is_Not_Equal()
         {
             // Arrange
-            var arguments = CreateArguments();
-            var events = CreateEvents("provider2");
+            var arguments = CreateArguments(providerName: "test");
 
             // Act
-            _extractor.ExtractEvents(events, arguments);
+            Extract(arguments);
 
             // Assert
             Assert.That(_exporter.Diffs, Is.Empty);
@@ -52,11 +55,10 @@ namespace Reporting.Tests.Implementations
         public void Should_Not_Extract_Events_When_Events_Are_Not_Equal()
         {
             // Arrange
-            var arguments = CreateArguments();
-            var events = CreateEvents(startEventName: "start2", stopEventName: "stop2");
+            var arguments = CreateArguments(startEventName: "start", stopEventName: "stop");
 
             // Act
-            _extractor.ExtractEvents(events, arguments);
+            Extract(arguments);
 
             // Assert
             Assert.That(_exporter.Diffs, Is.Empty);
@@ -68,40 +70,32 @@ namespace Reporting.Tests.Implementations
         {
             // Arrange
             var arguments = CreateArguments();
-            var events = CreateEvents();
 
             // Act
-            _extractor.ExtractEvents(events, arguments);
+            Extract(arguments);
 
             // Assert
             Assert.That(_exporter.CallCounter, Is.EqualTo(1));
             Assert.That(_exporter.Diffs, Is.Not.Empty);
         }
 
-        private IEnumerable<TraceEvent> CreateEvents(String providerName = "provider", String startEventName = "start", String stopEventName = "stop")
+        private void Extract(DiffExtractorArguments arguments)
         {
-            TimeSpan now = DateTime.UtcNow.TimeOfDay;
-            Guid activityId = Guid.NewGuid();
-
-            for (int i = 0; i < 10; i++)
+            using (var log = TraceLog.OpenOrConvert(_etlFilePath))
             {
-                yield return CreateEvent(providerName, startEventName, now, activityId);
-                yield return CreateEvent(providerName, stopEventName, now, activityId);
+                _extractor.ExtractEvents(log.Events, arguments);
             }
         }
 
-        private static FakeEvent CreateEvent(string providerName, string stopEventName, TimeSpan now, Guid activityId)
-        {
-            return new FakeEvent(stopEventName, providerName, now, activityId);
-        }
-
-        private static DiffExtractorArguments CreateArguments()
+        private static DiffExtractorArguments CreateArguments(string providerName = "Company-First-Logger",
+                                                              string stopEventName = "StopAction",
+                                                              string startEventName = "StartAction")
         {
             DiffExtractorArguments arguments = new DiffExtractorArguments
             {
-                ProviderName = "provider",
-                StartEvent = "start",
-                StopEvent = "end"
+                ProviderName = providerName,
+                StartEvent = startEventName,
+                StopEvent = stopEventName
             };
             return arguments;
         }
