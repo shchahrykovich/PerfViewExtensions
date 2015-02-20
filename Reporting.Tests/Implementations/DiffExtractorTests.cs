@@ -65,18 +65,21 @@ namespace Reporting.Tests.Implementations
             Assert.That(_exporter.CallCounter, Is.EqualTo(1));
         }
 
-        [Test]
-        public void Should_Extract_Events()
+        [TestCase("Company-First-Logger", "Begin", "End", 1)]
+        [TestCase("Company-First-Logger", "StartAction", "StopAction", 100)]
+        [TestCase("Company-Second-Logger", "Begin", "End", 60)]
+        [TestCase("Company-Second-Logger", "Start", "Finish", 1)]
+        public void Should_Return_Correct_Number_Of_Diffs(String provider, String start, String end, int expected)
         {
             // Arrange
-            var arguments = CreateArguments();
+            var arguments = CreateArguments(provider, start, end);
 
             // Act
             Extract(arguments);
 
             // Assert
             Assert.That(_exporter.CallCounter, Is.EqualTo(1));
-            Assert.That(_exporter.Diffs, Is.Not.Empty);
+            Assert.That(_exporter.Diffs.Count, Is.EqualTo(expected));
         }
 
         private void Extract(DiffExtractorArguments arguments)
@@ -88,8 +91,8 @@ namespace Reporting.Tests.Implementations
         }
 
         private static DiffExtractorArguments CreateArguments(string providerName = "Company-First-Logger",
-                                                              string stopEventName = "StopAction",
-                                                              string startEventName = "StartAction")
+                                                              string stopEventName = "Begin",
+                                                              string startEventName = "End")
         {
             DiffExtractorArguments arguments = new DiffExtractorArguments
             {
