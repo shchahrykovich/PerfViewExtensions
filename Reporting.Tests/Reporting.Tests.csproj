@@ -52,8 +52,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Fakes\FakeEvent.cs" />
-    <Compile Include="Implementations\DiffExtractorTests.cs" />
     <Compile Include="Fakes\FakeExporter.cs" />
+    <Compile Include="Implementations\DiffExtractorTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
