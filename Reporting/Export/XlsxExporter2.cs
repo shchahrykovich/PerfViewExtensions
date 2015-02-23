@@ -8,9 +8,9 @@ namespace Reporting.Export
 {
     internal class XlsxExporter2 : IExporter
     {
-        public void Export(string outputFileName, List<Diff> diffs)
+        public void Export(string outputFileName, DiffCollection diffs)
         {
-            XlsxExporter.WriteReport(outputFileName, diffs);
+            XlsxExporter.WriteReport(outputFileName, diffs.Diffs);
         }
     }
 }

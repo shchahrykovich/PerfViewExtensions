@@ -55,9 +55,9 @@ namespace Reporting.Implementations
             thread.Records.Add(new DataRecord(data.TimeStamp, data.ActivityID));
         }
 
-        private List<Diff> FindDiffs()
+        private DiffCollection FindDiffs()
         {
-            List<Diff> result = new List<Diff>();
+            DiffCollection result = new DiffCollection();
             foreach (var process in _data.Values)
             {
                 foreach (var thread in process.Threads.Values)
@@ -70,11 +70,10 @@ namespace Reporting.Implementations
                         var start = records[i];
                         var finish = records[i + 1];
 
-                        result.Add(new Diff(start, finish));
+                        result.Diffs.Add(new Diff(start, finish));
                     }
                 }
             }
-
             return result;
         }
     }

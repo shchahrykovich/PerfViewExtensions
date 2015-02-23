@@ -8,13 +8,13 @@ namespace Reporting.Tests.Fakes
     {
         public int CallCounter { get; private set; }
 
-        public List<Diff> Diffs { get; private set; }
+        public DiffCollection Result { get; private set; }
 
-        public void Export(string outputFileName, List<Diff> diffs)
+        public void Export(string outputFileName, DiffCollection diffs)
         {
             CallCounter++;
 
-            Diffs = diffs;
+            Result = diffs;
         }
     }
 }

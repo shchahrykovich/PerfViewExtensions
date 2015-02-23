@@ -47,7 +47,7 @@ namespace Reporting.Tests.Implementations
             Extract(arguments);
 
             // Assert
-            Assert.That(_exporter.Diffs, Is.Empty);
+            Assert.That(_exporter.Result, Is.Empty);
             Assert.That(_exporter.CallCounter, Is.EqualTo(1));
         }
 
@@ -61,7 +61,7 @@ namespace Reporting.Tests.Implementations
             Extract(arguments);
 
             // Assert
-            Assert.That(_exporter.Diffs, Is.Empty);
+            Assert.That(_exporter.Result, Is.Empty);
             Assert.That(_exporter.CallCounter, Is.EqualTo(1));
         }
 
@@ -79,7 +79,7 @@ namespace Reporting.Tests.Implementations
 
             // Assert
             Assert.That(_exporter.CallCounter, Is.EqualTo(1));
-            Assert.That(_exporter.Diffs.Count, Is.EqualTo(expected));
+            Assert.That(_exporter.Result.Diffs.Count, Is.EqualTo(expected));
         }
 
         private void Extract(DiffExtractorArguments arguments)
