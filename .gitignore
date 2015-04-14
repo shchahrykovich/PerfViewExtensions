@@ -238,3 +238,7 @@ Temporary Items
 Reporting.dll
 DocumentFormat.OpenXml.dll
 Reporting.XML
+/HdrHistogram.NET.dll
+
+testSrc/
+PerfViewData.log.txt

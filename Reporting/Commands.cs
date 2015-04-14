@@ -4,57 +4,46 @@ using PerfViewExtensibility;
 using Reporting.Export;
 using Reporting.Implementations;
 
-namespace Reporting
+public class Commands : CommandEnvironment
 {
-    public class Commands : CommandEnvironment
+    public void CalculateStatistics(string etlFileName, string providerName, string startEvent, string stopEvent, string outputReport = "report.xlsx")
     {
-        /// <summary>
-        /// Extracts difference between two events.
-        /// </summary>
-        /// <param name="etlFileName"></param>
-        /// <param name="providerName"></param>
-        /// <param name="startEvent"></param>
-        /// <param name="stopEvent"></param>
-        /// <param name="outputReport"></param>
-        public void ExtractDiffs(string etlFileName, string providerName, string startEvent, string stopEvent, string outputReport = "report.xlsx")
+        Parser parser = new Parser(new PerfViewLogFileExporter(LogFile));
+        using (ETLDataFile etlFile = OpenETLFile(etlFileName))
         {
-            DiffExtractor extractor = new DiffExtractor(new XlsxExporter2());
-            using (ETLDataFile etlFile = OpenETLFile(etlFileName))
+            ParserArguments arguments = new ParserArguments
             {
-                DiffExtractorArguments arguments = new DiffExtractorArguments
-                {
-                    ProviderName = providerName,
-                    StartEvent = startEvent,
-                    StopEvent = stopEvent,
-                    OutputReport = outputReport
-                };
+                ProviderName = providerName,
+                StartEvent = startEvent,
+                StopEvent = stopEvent,
+                OutputReport = outputReport
+            };
 
-                TraceEvents events = GetTraceEventsWithProcessFilter(etlFile);
-                extractor.ExtractEvents(events, arguments);
-            }
+            TraceEvents events = GetTraceEventsWithProcessFilter(etlFile);
+            parser.ExtractEvents(events, arguments);
         }
+    }
 
-        /// <summary>
-        /// Gets the TraceEvents list of events from etlFile, applying a process filter if the /process argument is given. 
-        /// </summary>
-        private TraceEvents GetTraceEventsWithProcessFilter(ETLDataFile etlFile)
+    /// <summary>
+    /// Gets the TraceEvents list of events from etlFile, applying a process filter if the /process argument is given. 
+    /// </summary>
+    private TraceEvents GetTraceEventsWithProcessFilter(ETLDataFile etlFile)
+    {
+        // If the user asked to focus on one process, do so.  
+        TraceEvents events;
+        if (CommandLineArgs.Process != null)
         {
-            // If the user asked to focus on one process, do so.  
-            TraceEvents events;
-            if (CommandLineArgs.Process != null)
+            var process = etlFile.Processes.LastProcessWithName(CommandLineArgs.Process);
+            if (process == null)
             {
-                var process = etlFile.Processes.LastProcessWithName(CommandLineArgs.Process);
-                if (process == null)
-                {
-                    throw new ApplicationException("Could not find process named " + CommandLineArgs.Process);
-                }
-                events = process.EventsInProcess;
+                throw new ApplicationException("Could not find process named " + CommandLineArgs.Process);
             }
-            else
-            {
-                events = etlFile.TraceLog.Events;
-            }
-            return events;
+            events = process.EventsInProcess;
         }
+        else
+        {
+            events = etlFile.TraceLog.Events;
+        }
+        return events;
     }
 }

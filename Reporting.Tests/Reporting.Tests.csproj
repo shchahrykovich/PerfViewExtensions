@@ -51,8 +51,6 @@
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Fakes\FakeExporter.cs" />
-    <Compile Include="Implementations\DiffExtractorTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Resources\Files.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -77,6 +75,9 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Files.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Implementations\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

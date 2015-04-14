@@ -55,6 +55,9 @@
       <Private>True</Private>
       <HintPath>..\packages\DocumentFormat.OpenXml.2.5\lib\DocumentFormat.OpenXml.dll</HintPath>
     </Reference>
+    <Reference Include="HdrHistogram.NET">
+      <HintPath>..\libs\HdrHistogram.NET.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.Diagnostics.FastSerialization">
       <HintPath>..\packages\PerfViewExtensionsLibrary.1.7.0.1\lib\net40\Microsoft.Diagnostics.FastSerialization.dll</HintPath>
     </Reference>
@@ -73,19 +76,17 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Commands.cs" />
-    <Compile Include="Implementations\DiffExtractor.cs" />
-    <Compile Include="Implementations\DiffExtractorArguments.cs" />
-    <Compile Include="Implementations\Entities\DataRecord.cs" />
-    <Compile Include="Implementations\Entities\Diff.cs" />
-    <Compile Include="Implementations\Entities\DiffCollection.cs" />
-    <Compile Include="Implementations\Entities\ProcessData.cs" />
-    <Compile Include="Implementations\Entities\ReportRecord.cs" />
-    <Compile Include="Implementations\Entities\ThreadData.cs" />
+    <Compile Include="Export\PerfViewLogFileExporter.cs" />
+    <Compile Include="Implementations\Parser.cs" />
+    <Compile Include="Implementations\ParserArguments.cs" />
     <Compile Include="Export\IExporter.cs" />
     <Compile Include="Export\XlsxExporter.cs" />
     <Compile Include="Export\XlsxExporter2.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Implementations\Point.cs" />
+    <Compile Include="Implementations\PointType.cs" />
+    <Compile Include="Implementations\Statistics.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -99,7 +100,8 @@
   <PropertyGroup>
     <PostBuildEvent>xcopy /y "$(TargetPath)" "$(ProjectDir).." &amp;
 xcopy /y "$(ProjectDir)$(OutDir)$(TargetName).xml" "$(ProjectDir).." &amp;
-xcopy /y "$(ProjectDir)$(OutDir)MathNet.Numerics.dll" "$(ProjectDir).." &amp;
+xcopy /y "$(ProjectDir)$(OutDir)HdrHistogram.NET.dll" "$(ProjectDir).." &amp;
+xcopy /y "$(ProjectDir)$(OutDir)HdrHistogram.NET.pdb" "$(ProjectDir).." &amp;
 xcopy /y "$(ProjectDir)$(OutDir)DocumentFormat.OpenXml.dll" "$(ProjectDir).."
 </PostBuildEvent>
   </PropertyGroup>

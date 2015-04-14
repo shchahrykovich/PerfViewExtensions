@@ -1,6 +1,6 @@
 ﻿namespace Reporting.Implementations
 {
-    internal class DiffExtractorArguments
+    internal class ParserArguments
     {
         public string ProviderName { get; set; }
         public string StartEvent { get; set; }

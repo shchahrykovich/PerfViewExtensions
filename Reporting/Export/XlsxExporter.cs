@@ -5,7 +5,6 @@ using System.Linq;
 using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
-using Reporting.Implementations.Entities;
 
 namespace Reporting.Export
 {
@@ -230,5 +229,16 @@ namespace Reporting.Export
 
             return rows;
         }
+    }
+
+    internal class Diff
+    {
+        public DiffRecord Finish { get; set; }
+        public DiffRecord Start { get; set; }
+    }
+
+    internal class DiffRecord
+    {
+        public DateTime TimeStamp { get; set; }
     }
 }

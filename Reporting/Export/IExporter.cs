@@ -1,9 +1,9 @@
-﻿using Reporting.Implementations.Entities;
+﻿using Reporting.Implementations;
 
 namespace Reporting.Export
 {
     internal interface IExporter
     {
-        void Export(string outputFileName, DiffCollection diffs);
+        void Export(Statistics stat);
     }
 }

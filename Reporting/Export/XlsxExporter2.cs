@@ -1,16 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Reporting.Implementations.Entities;
-
-namespace Reporting.Export
+﻿namespace Reporting.Export
 {
-    internal class XlsxExporter2 : IExporter
+    internal class XlsxExporter2
     {
-        public void Export(string outputFileName, DiffCollection diffs)
+        public void Export(string outputFileName)
         {
-            XlsxExporter.WriteReport(outputFileName, diffs.Diffs);
+            //XlsxExporter.WriteReport(outputFileName, diffs.Diffs);
         }
     }
 }
