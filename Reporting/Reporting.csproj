@@ -84,6 +84,7 @@
     <Compile Include="Export\XlsxExporter2.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Implementations\PercentileRecord.cs" />
     <Compile Include="Implementations\Point.cs" />
     <Compile Include="Implementations\PointType.cs" />
     <Compile Include="Implementations\Statistics.cs" />

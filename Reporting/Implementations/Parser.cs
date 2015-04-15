@@ -30,11 +30,35 @@ namespace Reporting.Implementations
         {
             Statistics result = new Statistics();
 
+            HistogramData histogramData = CreateHistogram(result);
+
+            result.MaxValue = histogramData.getMaxValue();
+            result.MinValue = histogramData.getMinValue();
+            result.StdDeviation = histogramData.getStdDeviation();
+            result.TotalCount = histogramData.getTotalCount();
+
+            foreach (var percentile in histogramData.percentiles(5))
+            {
+                PercentileRecord p = new PercentileRecord
+                {
+                    Value = percentile.getValueIteratedTo(),
+                    Percentile = percentile.getPercentileLevelIteratedTo(),
+                    TotalCount = percentile.getTotalCountToThisValue()
+                };
+
+                result.Percentiles.Add(p);
+            }
+
+            return result;
+        }
+
+        private HistogramData CreateHistogram(Statistics result)
+        {
             Histogram h = new Histogram(3600000000000L, 3);
 
             result.Points = _points.OrderBy(p => p.TimeStamp).ToArray();
             int firstStatrtIndex = GetStartEventIndex(result.Points);
-            for (int i = firstStatrtIndex; i + 1 < result.Points.Length; )
+            for (int i = firstStatrtIndex; i + 1 < result.Points.Length;)
             {
                 var start = result.Points[i];
                 var stop = result.Points[i + 1];
@@ -42,7 +66,7 @@ namespace Reporting.Implementations
                 if (start.Type == PointType.Start && stop.Type == PointType.Stop)
                 {
                     var diff = stop.TimeStamp - start.TimeStamp;
-                    h.recordValue((long)diff);
+                    h.recordValue((long) diff);
                     i += 2;
                 }
                 else
@@ -52,15 +76,7 @@ namespace Reporting.Implementations
             }
 
             HistogramData histogramData = h.getHistogramData();
-            result.MaxValue = histogramData.getMaxValue();
-            result.MinValue = histogramData.getMinValue();
-            result.StdDeviation = histogramData.getStdDeviation();
-            result.TotalCount = histogramData.getTotalCount();
-            result.Percentile90 = histogramData.getValueAtPercentile(90);
-            result.Percentile95 = histogramData.getValueAtPercentile(95);
-            result.Percentile99 = histogramData.getValueAtPercentile(99);
-
-            return result;
+            return histogramData;
         }
 
         private int GetStartEventIndex(Point[] points)

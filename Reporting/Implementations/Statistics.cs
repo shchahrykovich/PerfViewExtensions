@@ -1,4 +1,6 @@
-﻿namespace Reporting.Implementations
+﻿using System.Collections.Generic;
+
+namespace Reporting.Implementations
 {
     internal class Statistics
     {
@@ -7,8 +9,11 @@
         public long MaxValue { get; set; }
         public double StdDeviation { get; set; }
         public long TotalCount { get; set; }
-        public long Percentile90 { get; set; }
-        public long Percentile95 { get; set; }
-        public long Percentile99 { get; set; }
+        public List<PercentileRecord> Percentiles { get; set; }
+
+        public Statistics()
+        {
+            Percentiles = new List<PercentileRecord>();
+        }
     }
 }
