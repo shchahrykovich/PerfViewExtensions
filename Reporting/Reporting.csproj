@@ -81,6 +81,10 @@
     <Compile Include="Implementations\Parser.cs" />
     <Compile Include="Implementations\ParserArguments.cs" />
     <Compile Include="Viewers\IViewer.cs" />
+    <Compile Include="Viewers\Xlsx\BaseSheet.cs" />
+    <Compile Include="Viewers\Xlsx\HistogramSheet.cs" />
+    <Compile Include="Viewers\Xlsx\RawDataSheet.cs" />
+    <Compile Include="Viewers\Xlsx\StatSheet.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Implementations\PercentileRecord.cs" />
