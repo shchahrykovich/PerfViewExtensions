@@ -3,16 +3,16 @@ using System.Linq;
 using HdrHistogram.NET;
 using Microsoft.Diagnostics.Tracing;
 using PEFile;
-using Reporting.Export;
+using Reporting.Viewers;
 
 namespace Reporting.Implementations
 {
     internal class Parser
     {
-        private readonly IExporter _exporter;
+        private readonly IViewer _exporter;
         private readonly List<Point> _points;
 
-        public Parser(IExporter exporter)
+        public Parser(IViewer exporter)
         {
             _exporter = exporter;
             _points = new List<Point>();
@@ -23,7 +23,7 @@ namespace Reporting.Implementations
             FindEvents(events, arguments.ProviderName, arguments.StartEvent, arguments.StopEvent);
             Statistics s = CalculateStatistics();
 
-            _exporter.Export(s);
+            _exporter.Show(s);
         }
 
         private Statistics CalculateStatistics()

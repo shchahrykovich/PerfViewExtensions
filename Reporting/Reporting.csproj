@@ -76,12 +76,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Commands.cs" />
-    <Compile Include="Export\PerfViewLogFileExporter.cs" />
+    <Compile Include="Viewers\TextWriterViewer.cs" />
+    <Compile Include="Viewers\XlsxViewer.cs" />
     <Compile Include="Implementations\Parser.cs" />
     <Compile Include="Implementations\ParserArguments.cs" />
-    <Compile Include="Export\IExporter.cs" />
-    <Compile Include="Export\XlsxExporter.cs" />
-    <Compile Include="Export\XlsxExporter2.cs" />
+    <Compile Include="Viewers\IViewer.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Implementations\PercentileRecord.cs" />

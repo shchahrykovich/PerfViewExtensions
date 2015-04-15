@@ -1,19 +1,18 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using Reporting.Implementations;
 
-namespace Reporting.Export
+namespace Reporting.Viewers
 {
-    internal class PerfViewLogFileExporter : IExporter
+    internal class TextWriterViewer : IViewer
     {
         private readonly TextWriter _logFile;
 
-        public PerfViewLogFileExporter(TextWriter logFile)
+        public TextWriterViewer(TextWriter logFile)
         {
             _logFile = logFile;
         }
 
-        public void Export(Statistics stat)
+        public void Show(Statistics stat)
         {
             _logFile.WriteLine();
             _logFile.WriteLine("###Stat Report###");
