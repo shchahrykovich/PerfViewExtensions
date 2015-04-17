@@ -20,7 +20,7 @@ public class Commands : CommandEnvironment
             };
 
             TraceEvents events = GetTraceEventsWithProcessFilter(etlFile);
-            parser.ExtractEvents(events, arguments);
+            parser.Parse(events, arguments);
         }
     }
 

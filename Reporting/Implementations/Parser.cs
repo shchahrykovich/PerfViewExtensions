@@ -2,7 +2,6 @@
 using System.Linq;
 using HdrHistogram.NET;
 using Microsoft.Diagnostics.Tracing;
-using PEFile;
 using Reporting.Viewers;
 
 namespace Reporting.Implementations
@@ -18,7 +17,7 @@ namespace Reporting.Implementations
             _points = new List<Point>();
         }
 
-        public void ExtractEvents(IEnumerable<TraceEvent> events, ParserArguments arguments)
+        public void Parse(IEnumerable<TraceEvent> events, ParserArguments arguments)
         {
             FindEvents(events, arguments.ProviderName, arguments.StartEvent, arguments.StopEvent);
             Statistics s = CalculateStatistics();
