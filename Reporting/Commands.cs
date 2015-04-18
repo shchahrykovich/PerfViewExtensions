@@ -39,7 +39,7 @@ public class Commands : CommandEnvironment
     /// <summary>
     /// Gets the TraceEvents list of events from etlFile, applying a process filter if the /process argument is given. 
     /// </summary>
-    private TraceEvents GetTraceEventsWithProcessFilter(ETLDataFile etlFile)
+    private static TraceEvents GetTraceEventsWithProcessFilter(ETLDataFile etlFile)
     {
         // If the user asked to focus on one process, do so.  
         TraceEvents events;

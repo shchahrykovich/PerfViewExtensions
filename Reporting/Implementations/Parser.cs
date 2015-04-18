@@ -28,9 +28,9 @@ namespace Reporting.Implementations
         private Statistics CalculateStatistics()
         {
             Statistics result = new Statistics();
+            result.Diffs = GetDiffs(result);
 
-            HistogramData histogramData = CreateHistogram(result);
-
+            HistogramData histogramData = CreateHistogram(result.Diffs);
             result.MaxValue = histogramData.getMaxValue();
             result.MinValue = histogramData.getMinValue();
             result.StdDeviation = histogramData.getStdDeviation();
@@ -51,27 +51,39 @@ namespace Reporting.Implementations
             return result;
         }
 
-        private HistogramData CreateHistogram(Statistics result)
+        private List<double> GetDiffs(Statistics result)
         {
-            Histogram h = new Histogram(3600000000000L, 3);
+            List<double> diffs = new List<double>();
 
             result.Points = _points.OrderBy(p => p.TimeStamp).ToArray();
             int firstStatrtIndex = GetStartEventIndex(result.Points);
-            for (int i = firstStatrtIndex; i + 1 < result.Points.Length;)
+            for (int i = firstStatrtIndex; i + 1 < result.Points.Length; )
             {
                 var start = result.Points[i];
                 var stop = result.Points[i + 1];
 
                 if (start.Type == PointType.Start && stop.Type == PointType.Stop)
                 {
-                    var diff = stop.TimeStamp - start.TimeStamp;
-                    h.recordValue((long) diff);
+                    double diff = stop.TimeStamp - start.TimeStamp;
+                    diffs.Add(diff);
                     i += 2;
                 }
                 else
                 {
                     i += 1;
                 }
+            }
+
+            return diffs;
+        }
+
+        private HistogramData CreateHistogram(List<double> diffs)
+        {
+            Histogram h = new Histogram(3600000000000L, 3);
+
+            foreach (var diff in diffs)
+            {
+                h.recordValue((long)diff);
             }
 
             HistogramData histogramData = h.getHistogramData();

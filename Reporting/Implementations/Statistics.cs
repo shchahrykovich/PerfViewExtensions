@@ -10,10 +10,12 @@ namespace Reporting.Implementations
         public double StdDeviation { get; set; }
         public long TotalCount { get; set; }
         public List<PercentileRecord> Percentiles { get; set; }
+        public List<double> Diffs { get; set; }
 
         public Statistics()
         {
             Percentiles = new List<PercentileRecord>();
+            Diffs = new List<double>();
         }
     }
 }

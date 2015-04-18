@@ -19,8 +19,9 @@ namespace Reporting.Viewers
             _customSheets = new BaseSheet[]
             {
                 new StatSheet(),
-                new HistogramSheet(),
+                new HistogramDataSheet(),
                 new RawDataSheet(),
+                new DiffsSheet(),
             };
         }
 

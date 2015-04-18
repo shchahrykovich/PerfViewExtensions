@@ -7,44 +7,42 @@ using Reporting.Implementations;
 
 namespace Reporting.Viewers.Xlsx
 {
-    internal class HistogramSheet : BaseSheet
+    internal class DiffsSheet : BaseSheet
     {
         internal override void Create(WorkbookPart workBookPart, Sheets sheets)
         {
-            Create(workBookPart, sheets, "Histogram");
+            Create(workBookPart, sheets, "Diffs");
         }
 
         internal override void AddData(Statistics stat)
         {
-            IEnumerable<OpenXmlElement> header = AddHeader("Value", "Percentile", "TotalCount");
+            IEnumerable<OpenXmlElement> header = AddHeader("Diffs");
             SheetData.Append(header);
 
-            IEnumerable<OpenXmlElement> rows = AddHistogramRecords(stat);
+            IEnumerable<OpenXmlElement> rows = AddDiffs(stat);
             SheetData.Append(rows);
         }
 
-        private IEnumerable<OpenXmlElement> AddHistogramRecords(Statistics stat)
+        private static IEnumerable<OpenXmlElement> AddDiffs(Statistics stat)
         {
             List<Row> rows = new List<Row>();
 
-            foreach (var p in stat.Percentiles)
+            for (int i = 0; i < stat.Diffs.Count; i++)
             {
-                int rowIndex = rows.Count + OneBasedArray + HeaderRow;
+                double diff = stat.Diffs[i];
 
+                int rowIndex = i + HeaderRow + OneBasedArray;
                 Row row = new Row
                 {
                     RowIndex = (UInt32)rowIndex
                 };
 
-                row.Append(CreateCell(rowIndex, 1, p.Value));
-                row.Append(CreateCell(rowIndex, 2, p.Percentile));
-                row.Append(CreateCell(rowIndex, 3, p.TotalCount));
+                row.Append(CreateCell(rowIndex, 1, diff));
 
                 rows.Add(row);
             }
 
             return rows;
         }
-
     }
 }

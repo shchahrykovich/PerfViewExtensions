@@ -9,6 +9,7 @@ namespace Reporting.Viewers.Xlsx
 {
     internal abstract class BaseSheet
     {
+        protected WorksheetPart Part { get; private set; }
         protected SheetData SheetData { get; private set; }
         protected const int OneBasedArray = 1;
         protected const int HeaderRow = 1;
@@ -19,8 +20,8 @@ namespace Reporting.Viewers.Xlsx
 
         protected void Create(WorkbookPart workBookPart, Sheets sheets, String sheetName)
         {
-            WorksheetPart part = CreateSheet(workBookPart, sheets, sheetName);
-            SheetData = CreateSheetData(part);
+            Part = CreateSheet(workBookPart, sheets, sheetName);
+            SheetData = CreateSheetData();
         }
 
         protected static IEnumerable<OpenXmlElement> AddHeader(params String[] columnNames)
@@ -128,13 +129,13 @@ namespace Reporting.Viewers.Xlsx
             return columnName;
         }
 
-        private static SheetData CreateSheetData(WorksheetPart part)
+        private SheetData CreateSheetData()
         {
             SheetData sheetData = new SheetData();
 
             Worksheet worksheet = new Worksheet();
             worksheet.Append(sheetData);
-            part.Worksheet = worksheet;
+            Part.Worksheet = worksheet;
 
             return sheetData;
         }

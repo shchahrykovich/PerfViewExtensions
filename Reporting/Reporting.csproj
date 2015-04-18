@@ -82,7 +82,8 @@
     <Compile Include="Implementations\ParserArguments.cs" />
     <Compile Include="Viewers\IViewer.cs" />
     <Compile Include="Viewers\Xlsx\BaseSheet.cs" />
-    <Compile Include="Viewers\Xlsx\HistogramSheet.cs" />
+    <Compile Include="Viewers\Xlsx\DiffsSheet.cs" />
+    <Compile Include="Viewers\Xlsx\HistogramDataSheet.cs" />
     <Compile Include="Viewers\Xlsx\RawDataSheet.cs" />
     <Compile Include="Viewers\Xlsx\StatSheet.cs" />
   </ItemGroup>
