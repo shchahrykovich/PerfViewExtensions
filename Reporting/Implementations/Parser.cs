@@ -52,9 +52,9 @@ namespace Reporting.Implementations
             return result;
         }
 
-        private List<double> GetDiffs(Statistics result)
+        private List<DiffRecord> GetDiffs(Statistics result)
         {
-            List<double> diffs = new List<double>();
+            List<DiffRecord> diffs = new List<DiffRecord>();
 
             result.Points = _points.OrderBy(p => p.TimeStamp).ToArray();
             int firstStatrtIndex = GetStartEventIndex(result.Points);
@@ -66,7 +66,11 @@ namespace Reporting.Implementations
                 if (start.Type == PointType.Start && stop.Type == PointType.Stop)
                 {
                     double diff = stop.TimeStamp - start.TimeStamp;
-                    diffs.Add(diff);
+                    diffs.Add(new DiffRecord
+                    {
+                        Value = diff,
+                        TimeStamp = start.TimeStamp
+                    });
                     i += 2;
                 }
                 else
@@ -78,13 +82,13 @@ namespace Reporting.Implementations
             return diffs;
         }
 
-        private HistogramData CreateHistogram(List<double> diffs)
+        private HistogramData CreateHistogram(List<DiffRecord> diffs)
         {
             Histogram h = new Histogram(3600000000000L, 3);
 
             foreach (var diff in diffs)
             {
-                h.recordValue((long)diff);
+                h.recordValue((long)diff.Value);
             }
 
             HistogramData histogramData = h.getHistogramData();

@@ -19,29 +19,14 @@ using A = DocumentFormat.OpenXml.Drawing;
 
 namespace Reporting.Viewers.Xlsx
 {
-    internal class HistogramSheet : GraphSheet
+    internal class TimelineSheet : GraphSheet
     {
         internal override void Create(WorkbookPart workBookPart, Sheets sheets)
         {
-            Create(workBookPart, sheets, "Histogram");
+            Create(workBookPart, sheets, "Timeline");
         }
 
         internal override void AddData(Statistics stat)
-        {
-            List<long> count = new List<long>();
-            List<double> values = new List<double>();
-
-            foreach (var percentile in stat.Percentiles)
-            {
-                count.Add(percentile.Count);
-                values.Add(percentile.Value);
-            }
-
-            InsertChartInSpreadsheet(count, values);
-        }
-
-        //https://github.com/OfficeDev/office-content/blob/master/en-us/OpenXMLCon/articles/281776d0-be75-46eb-8fdc-a1f656291175.md
-        private void InsertChartInSpreadsheet(List<long> count, List<double> values)
         {
             // Add a new drawing to the worksheet.
             DrawingsPart drawingsPart = WorksheetPart.AddNewPart<DrawingsPart>();
@@ -53,19 +38,17 @@ namespace Reporting.Viewers.Xlsx
 
             // Add a new chart and set the chart language to English-US.
             var chartPart = CreateChartPart(drawingsPart);
-            DocumentFormat.OpenXml.Drawing.Charts.Chart chart = chartPart.ChartSpace
-                .AppendChild<DocumentFormat.OpenXml.Drawing.Charts.Chart>(
-                    new DocumentFormat.OpenXml.Drawing.Charts.Chart());
+            DocumentFormat.OpenXml.Drawing.Charts.Chart chart = chartPart.ChartSpace.AppendChild(new DocumentFormat.OpenXml.Drawing.Charts.Chart());
 
             // Create a new clustered column chart.
             PlotArea plotArea = chart.AppendChild<PlotArea>(new PlotArea());
-            Layout layout = plotArea.AppendChild<Layout>(new Layout());
+            plotArea.AppendChild<Layout>(new Layout());
             BarChart barChart =
                 plotArea.AppendChild<BarChart>(
                     new BarChart(
-                        new BarDirection() {Val = new EnumValue<BarDirectionValues>(BarDirectionValues.Column)},
-                        new BarGrouping() {Val = new EnumValue<BarGroupingValues>(BarGroupingValues.Clustered)},
-                        new VaryColors() {Val = false}
+                        new BarDirection() { Val = new EnumValue<BarDirectionValues>(BarDirectionValues.Column) },
+                        new BarGrouping() { Val = new EnumValue<BarGroupingValues>(BarGroupingValues.Clustered) },
+                        new VaryColors() { Val = false }
                         ));
 
             // Iterate through each key in the Dictionary collection and add the key to the chart Series
@@ -73,32 +56,34 @@ namespace Reporting.Viewers.Xlsx
 
             BarChartSeries barChartSeries = barChart.AppendChild<BarChartSeries>(new BarChartSeries(new Index()
             {
-                Val = new UInt32Value((uint) 0)
+                Val = new UInt32Value((uint)0)
             },
-                new Order() {Val = new UInt32Value((uint) 0)},
-                new SeriesText(new NumericValue() {Text = "Histogram"})));
+                new Order() { Val = new UInt32Value((uint)0) },
+                new SeriesText(new NumericValue() { Text = "Histogram" })));
 
             StringLiteral strLit =
                 barChartSeries.AppendChild<CategoryAxisData>(new CategoryAxisData())
                     .AppendChild<StringLiteral>(new StringLiteral());
-            strLit.Append(new PointCount() {Val = new UInt32Value((uint) count.Count)});
+            strLit.Append(new PointCount() { Val = new UInt32Value((uint)stat.Diffs.Count) });
 
             NumberLiteral numLit = barChartSeries.AppendChild<DocumentFormat.OpenXml.Drawing.Charts.Values>(
                 new DocumentFormat.OpenXml.Drawing.Charts.Values())
                 .AppendChild<NumberLiteral>(new NumberLiteral());
             numLit.Append(new FormatCode("General"));
-            numLit.Append(new PointCount() {Val = new UInt32Value((uint) count.Count)});
+            numLit.Append(new PointCount() { Val = new UInt32Value((uint)stat.Diffs.Count) });
 
-            for (uint i = 0; i < count.Count; i++)
+            uint i = 0;
+            foreach (var diff in stat.Diffs)
             {
-                strLit.AppendChild<StringPoint>(new StringPoint() {Index = new UInt32Value(i)})
-                    .Append(new NumericValue(values[(int) i].ToString()));
-                numLit.AppendChild<NumericPoint>(new NumericPoint() {Index = new UInt32Value(i)})
-                    .Append(new NumericValue(count[(int) i].ToString()));
+                strLit.AppendChild<StringPoint>(new StringPoint() { Index = new UInt32Value(i) })
+                    .Append(new NumericValue(diff.TimeStamp.ToString()));
+                numLit.AppendChild<NumericPoint>(new NumericPoint() { Index = new UInt32Value(i) })
+                    .Append(new NumericValue(diff.Value.ToString()));
+                i++;
             }
 
-            barChart.Append(new AxisId() {Val = new UInt32Value(48650112u)});
-            barChart.Append(new AxisId() {Val = new UInt32Value(48672768u)});
+            barChart.Append(new AxisId() { Val = new UInt32Value(48650112u) });
+            barChart.Append(new AxisId() { Val = new UInt32Value(48672768u) });
 
             // Add the Category Axis.
             CategoryAxis catAx =
@@ -113,32 +98,32 @@ namespace Reporting.Viewers.Xlsx
                             new EnumValue<DocumentFormat.OpenXml.Drawing.Charts.OrientationValues>(
                                 DocumentFormat.OpenXml.Drawing.Charts.OrientationValues.MinMax)
                     }),
-                    new Delete() {Val = false},
+                    new Delete() { Val = false },
                     GenerateTitle("Time, ms"),
-                    new AxisPosition() {Val = new EnumValue<AxisPositionValues>(AxisPositionValues.Bottom)},
+                    new AxisPosition() { Val = new EnumValue<AxisPositionValues>(AxisPositionValues.Bottom) },
                     new TickLabelPosition()
                     {
                         Val = new EnumValue<TickLabelPositionValues>(TickLabelPositionValues.NextTo)
                     },
-                    new CrossingAxis() {Val = new UInt32Value(48672768U)},
-                    new Crosses() {Val = new EnumValue<CrossesValues>(CrossesValues.AutoZero)},
-                    new AutoLabeled() {Val = new BooleanValue(true)},
-                    new LabelAlignment() {Val = new EnumValue<LabelAlignmentValues>(LabelAlignmentValues.Center)},
-                    new LabelOffset() {Val = new UInt16Value((ushort) 100)}));
+                    new CrossingAxis() { Val = new UInt32Value(48672768U) },
+                    new Crosses() { Val = new EnumValue<CrossesValues>(CrossesValues.AutoZero) },
+                    new AutoLabeled() { Val = new BooleanValue(true) },
+                    new LabelAlignment() { Val = new EnumValue<LabelAlignmentValues>(LabelAlignmentValues.Center) },
+                    new LabelOffset() { Val = new UInt16Value((ushort)100) }));
 
             // Add the Value Axis.
             ValueAxis valAx =
-                plotArea.AppendChild<ValueAxis>(new ValueAxis(new AxisId() {Val = new UInt32Value(48672768u)},
+                plotArea.AppendChild<ValueAxis>(new ValueAxis(new AxisId() { Val = new UInt32Value(48672768u) },
                     new Scaling(new Orientation()
                     {
                         Val =
                             new EnumValue<DocumentFormat.OpenXml.Drawing.Charts.OrientationValues>(
                                 DocumentFormat.OpenXml.Drawing.Charts.OrientationValues.MinMax)
                     }),
-                    new AxisPosition() {Val = new EnumValue<AxisPositionValues>(AxisPositionValues.Left)},
+                    new AxisPosition() { Val = new EnumValue<AxisPositionValues>(AxisPositionValues.Left) },
                     new MajorGridlines(),
-                    GenerateTitle("Number of samples"),
-                    new Delete() {Val = false},
+                    GenerateTitle("Duration, ms"),
+                    new Delete() { Val = false },
                     new DocumentFormat.OpenXml.Drawing.Charts.NumberingFormat()
                     {
                         FormatCode = new StringValue("General"),
@@ -147,25 +132,22 @@ namespace Reporting.Viewers.Xlsx
                     {
                         Val = new EnumValue<TickLabelPositionValues>(TickLabelPositionValues.NextTo)
                     },
-                    new CrossingAxis() {Val = new UInt32Value(48650112U)},
-                    new Crosses() {Val = new EnumValue<CrossesValues>(CrossesValues.AutoZero)},
-                    new CrossBetween() {Val = new EnumValue<CrossBetweenValues>(CrossBetweenValues.Between)}));
+                    new CrossingAxis() { Val = new UInt32Value(48650112U) },
+                    new Crosses() { Val = new EnumValue<CrossesValues>(CrossesValues.AutoZero) },
+                    new CrossBetween() { Val = new EnumValue<CrossBetweenValues>(CrossBetweenValues.Between) }));
 
             // Add the chart Legend.
             Legend legend =
                 chart.AppendChild<Legend>(
                     new Legend(
-                        new LegendPosition() {Val = new EnumValue<LegendPositionValues>(LegendPositionValues.Right)},
+                        new LegendPosition() { Val = new EnumValue<LegendPositionValues>(LegendPositionValues.Right) },
                         new Layout()));
 
-            chart.Append(new PlotVisibleOnly() {Val = new BooleanValue(true)});
-
-            // Save the chart part.
-            chartPart.ChartSpace.Save();
+            chart.Append(new PlotVisibleOnly() { Val = new BooleanValue(true) });
 
             // Position the chart on the worksheet using a TwoCellAnchor object.
             drawingsPart.WorksheetDrawing = new WorksheetDrawing();
-            
+
             AppendGraphicFrame(drawingsPart, chartPart);
 
             // Save the WorksheetDrawing object.

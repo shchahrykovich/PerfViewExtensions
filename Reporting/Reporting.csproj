@@ -76,6 +76,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Commands.cs" />
+    <Compile Include="Implementations\DiffRecord.cs" />
     <Compile Include="Viewers\TextWriterViewer.cs" />
     <Compile Include="Viewers\XlsxViewer.cs" />
     <Compile Include="Implementations\Parser.cs" />
@@ -84,10 +85,12 @@
     <Compile Include="Viewers\Xlsx\BaseSheet.cs" />
     <Compile Include="Viewers\Xlsx\DataSheet.cs" />
     <Compile Include="Viewers\Xlsx\DiffsSheet.cs" />
+    <Compile Include="Viewers\Xlsx\GraphSheet.cs" />
     <Compile Include="Viewers\Xlsx\HistogramDataSheet.cs" />
     <Compile Include="Viewers\Xlsx\HistogramSheet.cs" />
     <Compile Include="Viewers\Xlsx\RawDataSheet.cs" />
     <Compile Include="Viewers\Xlsx\StatSheet.cs" />
+    <Compile Include="Viewers\Xlsx\TimelineSheet.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Implementations\PercentileRecord.cs" />

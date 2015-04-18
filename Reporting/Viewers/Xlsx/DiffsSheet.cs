@@ -16,7 +16,7 @@ namespace Reporting.Viewers.Xlsx
 
         internal override void AddData(Statistics stat)
         {
-            IEnumerable<OpenXmlElement> header = AddHeader("Diffs");
+            IEnumerable<OpenXmlElement> header = AddHeader("TimeStamp", "Diffs");
             SheetData.Append(header);
 
             IEnumerable<OpenXmlElement> rows = AddDiffs(stat);
@@ -29,7 +29,7 @@ namespace Reporting.Viewers.Xlsx
 
             for (int i = 0; i < stat.Diffs.Count; i++)
             {
-                double diff = stat.Diffs[i];
+                var diff = stat.Diffs[i];
 
                 int rowIndex = i + HeaderRow + OneBasedArray;
                 Row row = new Row
@@ -37,7 +37,8 @@ namespace Reporting.Viewers.Xlsx
                     RowIndex = (UInt32)rowIndex
                 };
 
-                row.Append(CreateCell(rowIndex, 1, diff));
+                row.Append(CreateCell(rowIndex, 1, diff.TimeStamp));
+                row.Append(CreateCell(rowIndex, 2, diff.Value));
 
                 rows.Add(row);
             }
