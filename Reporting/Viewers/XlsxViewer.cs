@@ -20,6 +20,7 @@ namespace Reporting.Viewers
             {
                 new StatSheet(),
                 new HistogramDataSheet(),
+                new HistogramSheet(),
                 new RawDataSheet(),
                 new DiffsSheet(),
             };

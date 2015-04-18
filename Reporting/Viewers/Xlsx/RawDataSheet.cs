@@ -7,7 +7,7 @@ using Reporting.Implementations;
 
 namespace Reporting.Viewers.Xlsx
 {
-    internal class RawDataSheet: BaseSheet
+    internal class RawDataSheet: DataSheet
     {
         internal override void Create(WorkbookPart workBookPart, Sheets sheets)
         {

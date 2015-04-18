@@ -42,7 +42,8 @@ namespace Reporting.Implementations
                 {
                     Value = percentile.getValueIteratedTo(),
                     Percentile = percentile.getPercentileLevelIteratedTo(),
-                    TotalCount = percentile.getTotalCountToThisValue()
+                    TotalCount = percentile.getTotalCountToThisValue(),
+                    Count = percentile.getCountAddedInThisIterationStep()
                 };
 
                 result.Percentiles.Add(p);

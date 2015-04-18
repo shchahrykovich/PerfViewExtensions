@@ -7,7 +7,7 @@ using Reporting.Implementations;
 
 namespace Reporting.Viewers.Xlsx
 {
-    internal class HistogramDataSheet : BaseSheet
+    internal class HistogramDataSheet : DataSheet
     {
         internal override void Create(WorkbookPart workBookPart, Sheets sheets)
         {
@@ -16,7 +16,7 @@ namespace Reporting.Viewers.Xlsx
 
         internal override void AddData(Statistics stat)
         {
-            IEnumerable<OpenXmlElement> header = AddHeader("Value", "Percentile", "TotalCount");
+            IEnumerable<OpenXmlElement> header = AddHeader("Value", "Percentile", "TotalCount", "Count");
             SheetData.Append(header);
 
             IEnumerable<OpenXmlElement> rows = AddHistogramRecords(stat);
@@ -39,6 +39,7 @@ namespace Reporting.Viewers.Xlsx
                 row.Append(CreateCell(rowIndex, 1, p.Value));
                 row.Append(CreateCell(rowIndex, 2, p.Percentile));
                 row.Append(CreateCell(rowIndex, 3, p.TotalCount));
+                row.Append(CreateCell(rowIndex, 4, p.Count));
 
                 rows.Add(row);
             }

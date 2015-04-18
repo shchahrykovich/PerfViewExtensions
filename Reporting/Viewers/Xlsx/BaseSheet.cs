@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
@@ -9,124 +8,36 @@ namespace Reporting.Viewers.Xlsx
 {
     internal abstract class BaseSheet
     {
-        protected WorksheetPart Part { get; private set; }
         protected SheetData SheetData { get; private set; }
-        protected const int OneBasedArray = 1;
-        protected const int HeaderRow = 1;
+        protected Sheet Sheet { get; private set; }
+        protected WorkbookPart WorkbookPart { get; private set; }
+        protected WorksheetPart WorksheetPart { get; private set; }
 
         internal abstract void AddData(Statistics stat);
 
-        internal abstract void Create(WorkbookPart workBookPart, Sheets sheets);        
+        internal abstract void Create(WorkbookPart workBookPart, Sheets sheets);
 
-        protected void Create(WorkbookPart workBookPart, Sheets sheets, String sheetName)
+        protected virtual void Create(WorkbookPart workBookPart, Sheets sheets, String sheetName)
         {
-            Part = CreateSheet(workBookPart, sheets, sheetName);
+            WorkbookPart = workBookPart;
+            WorksheetPart = CreateSheet(sheets, sheetName);
             SheetData = CreateSheetData();
         }
 
-        protected static IEnumerable<OpenXmlElement> AddHeader(params String[] columnNames)
+        private WorksheetPart CreateSheet(Sheets sheets, string sheetName)
         {
-            Row header = new Row
+            uint sheetId = (uint)sheets.ChildElements.Count + 1;
+            String sheetIdName = "rId" + sheetId;
+
+            Sheet = new Sheet()
             {
-                RowIndex = (UInt32)OneBasedArray
+                Name = sheetName,
+                SheetId = (UInt32Value)sheetId,
+                Id = sheetIdName
             };
+            sheets.Append(Sheet);
 
-            for (int i = 0; i < columnNames.Length; i++)
-            {
-                Cell column = CreateCell(1, i + OneBasedArray, columnNames[i]);
-                header.Append(column);
-            }
-
-            return new[] { header };
-        }
-
-        protected static void AddRow(List<Row> rows, string name, long value)
-        {
-            int rowIndex = rows.Count + OneBasedArray;
-
-            Row row = new Row
-            {
-                RowIndex = (UInt32)rowIndex
-            };
-
-            row.Append(CreateCell(rowIndex, 1, name));
-            row.Append(CreateCell(rowIndex, 2, value));
-
-            rows.Add(row);
-        }
-
-        protected static void AddRow(List<Row> rows, string name, double value)
-        {
-            int rowIndex = rows.Count + OneBasedArray;
-
-            Row row = new Row
-            {
-                RowIndex = (UInt32)rowIndex
-            };
-
-            row.Append(CreateCell(rowIndex, 1, name));
-            row.Append(CreateCell(rowIndex, 2, value));
-
-            rows.Add(row);
-        }
-
-        protected static Cell CreateCell(int rowIndex, int columnIndex, String value)
-        {
-            Cell cell = new Cell
-            {
-                DataType = CellValues.InlineString,
-                CellReference = GetColumnName(columnIndex) + rowIndex
-            };
-
-            InlineString inlineString = new InlineString();
-            inlineString.AppendChild(new Text
-            {
-                Text = value
-            });
-
-            cell.AppendChild(inlineString);
-
-            return cell;
-        }
-
-        protected static Cell CreateCell(int rowIndex, int columnIndex, double value)
-        {
-            Cell cell = new Cell
-            {
-                DataType = CellValues.Number,
-                CellReference = GetColumnName(columnIndex) + rowIndex,
-                CellValue = new CellValue(value.ToString())
-            };
-
-            return cell;
-        }
-
-        protected static Cell CreateCell(int rowIndex, int columnIndex, int value)
-        {
-            Cell cell = new Cell
-            {
-                DataType = CellValues.Number,
-                CellReference = GetColumnName(columnIndex) + rowIndex,
-                CellValue = new CellValue(value.ToString())
-            };
-
-            return cell;
-        }
-
-        private static string GetColumnName(int columnIndex)
-        {
-            int dividend = columnIndex;
-            string columnName = String.Empty;
-
-            while (dividend > 0)
-            {
-                int modifier = (dividend - 1) % 26;
-                columnName =
-                    Convert.ToChar(65 + modifier).ToString() + columnName;
-                dividend = (int)((dividend - modifier) / 26);
-            }
-
-            return columnName;
+            return WorkbookPart.AddNewPart<WorksheetPart>(sheetIdName);
         }
 
         private SheetData CreateSheetData()
@@ -135,25 +46,9 @@ namespace Reporting.Viewers.Xlsx
 
             Worksheet worksheet = new Worksheet();
             worksheet.Append(sheetData);
-            Part.Worksheet = worksheet;
+            WorksheetPart.Worksheet = worksheet;
 
             return sheetData;
-        }
-
-        private static WorksheetPart CreateSheet(WorkbookPart workbookPart, Sheets sheets, string sheetName)
-        {
-            uint sheetId = (uint) sheets.ChildElements.Count + 1;
-            String sheetIdName = "rId" + sheetId;
-
-            Sheet sheet = new Sheet()
-            {
-                Name = sheetName,
-                SheetId = (UInt32Value) sheetId,
-                Id = sheetIdName
-            };
-            sheets.Append(sheet);
-
-            return workbookPart.AddNewPart<WorksheetPart>(sheetIdName);
         }
     }
 }

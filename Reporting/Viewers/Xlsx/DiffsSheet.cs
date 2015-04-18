@@ -7,7 +7,7 @@ using Reporting.Implementations;
 
 namespace Reporting.Viewers.Xlsx
 {
-    internal class DiffsSheet : BaseSheet
+    internal class DiffsSheet : DataSheet
     {
         internal override void Create(WorkbookPart workBookPart, Sheets sheets)
         {

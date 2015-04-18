@@ -6,7 +6,7 @@ using Reporting.Implementations;
 
 namespace Reporting.Viewers.Xlsx
 {
-    internal class StatSheet : BaseSheet
+    internal class StatSheet : DataSheet
     {
         internal override void AddData(Statistics stat)
         {
