@@ -243,3 +243,4 @@ Reporting.XML
 testSrc/
 PerfViewData.log.txt
 /*.xlsx
+open.bat

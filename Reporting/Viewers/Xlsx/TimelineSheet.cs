@@ -26,6 +26,7 @@ namespace Reporting.Viewers.Xlsx
             Create(workBookPart, sheets, "Timeline");
         }
 
+        //Here be dragons
         internal override void AddData(Statistics stat)
         {
             // Add a new drawing to the worksheet.
@@ -59,7 +60,7 @@ namespace Reporting.Viewers.Xlsx
                 Val = new UInt32Value((uint)0)
             },
                 new Order() { Val = new UInt32Value((uint)0) },
-                new SeriesText(new NumericValue() { Text = "Histogram" })));
+                new SeriesText(new NumericValue() { Text = "Timeline" })));
 
             StringLiteral strLit =
                 barChartSeries.AppendChild<CategoryAxisData>(new CategoryAxisData())
@@ -85,56 +86,8 @@ namespace Reporting.Viewers.Xlsx
             barChart.Append(new AxisId() { Val = new UInt32Value(48650112u) });
             barChart.Append(new AxisId() { Val = new UInt32Value(48672768u) });
 
-            // Add the Category Axis.
-            CategoryAxis catAx =
-                plotArea.AppendChild<CategoryAxis>(new CategoryAxis(
-                    new AxisId()
-                    {
-                        Val = new UInt32Value(48650112u)
-                    },
-                    new Scaling(new Orientation()
-                    {
-                        Val =
-                            new EnumValue<DocumentFormat.OpenXml.Drawing.Charts.OrientationValues>(
-                                DocumentFormat.OpenXml.Drawing.Charts.OrientationValues.MinMax)
-                    }),
-                    new Delete() { Val = false },
-                    GenerateTitle("Time, ms"),
-                    new AxisPosition() { Val = new EnumValue<AxisPositionValues>(AxisPositionValues.Bottom) },
-                    new TickLabelPosition()
-                    {
-                        Val = new EnumValue<TickLabelPositionValues>(TickLabelPositionValues.NextTo)
-                    },
-                    new CrossingAxis() { Val = new UInt32Value(48672768U) },
-                    new Crosses() { Val = new EnumValue<CrossesValues>(CrossesValues.AutoZero) },
-                    new AutoLabeled() { Val = new BooleanValue(true) },
-                    new LabelAlignment() { Val = new EnumValue<LabelAlignmentValues>(LabelAlignmentValues.Center) },
-                    new LabelOffset() { Val = new UInt16Value((ushort)100) }));
-
-            // Add the Value Axis.
-            ValueAxis valAx =
-                plotArea.AppendChild<ValueAxis>(new ValueAxis(new AxisId() { Val = new UInt32Value(48672768u) },
-                    new Scaling(new Orientation()
-                    {
-                        Val =
-                            new EnumValue<DocumentFormat.OpenXml.Drawing.Charts.OrientationValues>(
-                                DocumentFormat.OpenXml.Drawing.Charts.OrientationValues.MinMax)
-                    }),
-                    new AxisPosition() { Val = new EnumValue<AxisPositionValues>(AxisPositionValues.Left) },
-                    new MajorGridlines(),
-                    GenerateTitle("Duration, ms"),
-                    new Delete() { Val = false },
-                    new DocumentFormat.OpenXml.Drawing.Charts.NumberingFormat()
-                    {
-                        FormatCode = new StringValue("General"),
-                        SourceLinked = new BooleanValue(true)
-                    }, new TickLabelPosition()
-                    {
-                        Val = new EnumValue<TickLabelPositionValues>(TickLabelPositionValues.NextTo)
-                    },
-                    new CrossingAxis() { Val = new UInt32Value(48650112U) },
-                    new Crosses() { Val = new EnumValue<CrossesValues>(CrossesValues.AutoZero) },
-                    new CrossBetween() { Val = new EnumValue<CrossBetweenValues>(CrossBetweenValues.Between) }));
+            AppendCategoryAxis(plotArea, 48650112u, "Time, ms", 48672768U);
+            AppendValueAxis(plotArea, 48672768u, "Number of samples", 48650112U);
 
             // Add the chart Legend.
             Legend legend =

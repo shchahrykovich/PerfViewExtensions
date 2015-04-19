@@ -26,22 +26,9 @@ namespace Reporting.Viewers.Xlsx
             Create(workBookPart, sheets, "Histogram");
         }
 
-        internal override void AddData(Statistics stat)
-        {
-            List<long> count = new List<long>();
-            List<double> values = new List<double>();
-
-            foreach (var percentile in stat.Percentiles)
-            {
-                count.Add(percentile.Count);
-                values.Add(percentile.Value);
-            }
-
-            InsertChartInSpreadsheet(count, values);
-        }
-
         //https://github.com/OfficeDev/office-content/blob/master/en-us/OpenXMLCon/articles/281776d0-be75-46eb-8fdc-a1f656291175.md
-        private void InsertChartInSpreadsheet(List<long> count, List<double> values)
+        //Here be dragons
+        internal override void AddData(Statistics stat)
         {
             // Add a new drawing to the worksheet.
             DrawingsPart drawingsPart = WorksheetPart.AddNewPart<DrawingsPart>();
@@ -54,109 +41,20 @@ namespace Reporting.Viewers.Xlsx
             // Add a new chart and set the chart language to English-US.
             var chartPart = CreateChartPart(drawingsPart);
             DocumentFormat.OpenXml.Drawing.Charts.Chart chart = chartPart.ChartSpace
-                .AppendChild<DocumentFormat.OpenXml.Drawing.Charts.Chart>(
-                    new DocumentFormat.OpenXml.Drawing.Charts.Chart());
+                .AppendChild(new DocumentFormat.OpenXml.Drawing.Charts.Chart());
 
             // Create a new clustered column chart.
-            PlotArea plotArea = chart.AppendChild<PlotArea>(new PlotArea());
-            Layout layout = plotArea.AppendChild<Layout>(new Layout());
-            BarChart barChart =
-                plotArea.AppendChild<BarChart>(
-                    new BarChart(
-                        new BarDirection() {Val = new EnumValue<BarDirectionValues>(BarDirectionValues.Column)},
-                        new BarGrouping() {Val = new EnumValue<BarGroupingValues>(BarGroupingValues.Clustered)},
-                        new VaryColors() {Val = false}
-                        ));
+            PlotArea plotArea = chart.AppendChild(new PlotArea());
+            plotArea.AppendChild(new Layout());
 
-            // Iterate through each key in the Dictionary collection and add the key to the chart Series
-            // and add the corresponding value to the chart Values.
-
-            BarChartSeries barChartSeries = barChart.AppendChild<BarChartSeries>(new BarChartSeries(new Index()
-            {
-                Val = new UInt32Value((uint) 0)
-            },
-                new Order() {Val = new UInt32Value((uint) 0)},
-                new SeriesText(new NumericValue() {Text = "Histogram"})));
-
-            StringLiteral strLit =
-                barChartSeries.AppendChild<CategoryAxisData>(new CategoryAxisData())
-                    .AppendChild<StringLiteral>(new StringLiteral());
-            strLit.Append(new PointCount() {Val = new UInt32Value((uint) count.Count)});
-
-            NumberLiteral numLit = barChartSeries.AppendChild<DocumentFormat.OpenXml.Drawing.Charts.Values>(
-                new DocumentFormat.OpenXml.Drawing.Charts.Values())
-                .AppendChild<NumberLiteral>(new NumberLiteral());
-            numLit.Append(new FormatCode("General"));
-            numLit.Append(new PointCount() {Val = new UInt32Value((uint) count.Count)});
-
-            for (uint i = 0; i < count.Count; i++)
-            {
-                strLit.AppendChild<StringPoint>(new StringPoint() {Index = new UInt32Value(i)})
-                    .Append(new NumericValue(values[(int) i].ToString()));
-                numLit.AppendChild<NumericPoint>(new NumericPoint() {Index = new UInt32Value(i)})
-                    .Append(new NumericValue(count[(int) i].ToString()));
-            }
-
-            barChart.Append(new AxisId() {Val = new UInt32Value(48650112u)});
-            barChart.Append(new AxisId() {Val = new UInt32Value(48672768u)});
-
-            // Add the Category Axis.
-            CategoryAxis catAx =
-                plotArea.AppendChild<CategoryAxis>(new CategoryAxis(
-                    new AxisId()
-                    {
-                        Val = new UInt32Value(48650112u)
-                    },
-                    new Scaling(new Orientation()
-                    {
-                        Val =
-                            new EnumValue<DocumentFormat.OpenXml.Drawing.Charts.OrientationValues>(
-                                DocumentFormat.OpenXml.Drawing.Charts.OrientationValues.MinMax)
-                    }),
-                    new Delete() {Val = false},
-                    GenerateTitle("Time, ms"),
-                    new AxisPosition() {Val = new EnumValue<AxisPositionValues>(AxisPositionValues.Bottom)},
-                    new TickLabelPosition()
-                    {
-                        Val = new EnumValue<TickLabelPositionValues>(TickLabelPositionValues.NextTo)
-                    },
-                    new CrossingAxis() {Val = new UInt32Value(48672768U)},
-                    new Crosses() {Val = new EnumValue<CrossesValues>(CrossesValues.AutoZero)},
-                    new AutoLabeled() {Val = new BooleanValue(true)},
-                    new LabelAlignment() {Val = new EnumValue<LabelAlignmentValues>(LabelAlignmentValues.Center)},
-                    new LabelOffset() {Val = new UInt16Value((ushort) 100)}));
-
-            // Add the Value Axis.
-            ValueAxis valAx =
-                plotArea.AppendChild<ValueAxis>(new ValueAxis(new AxisId() {Val = new UInt32Value(48672768u)},
-                    new Scaling(new Orientation()
-                    {
-                        Val =
-                            new EnumValue<DocumentFormat.OpenXml.Drawing.Charts.OrientationValues>(
-                                DocumentFormat.OpenXml.Drawing.Charts.OrientationValues.MinMax)
-                    }),
-                    new AxisPosition() {Val = new EnumValue<AxisPositionValues>(AxisPositionValues.Left)},
-                    new MajorGridlines(),
-                    GenerateTitle("Number of samples"),
-                    new Delete() {Val = false},
-                    new DocumentFormat.OpenXml.Drawing.Charts.NumberingFormat()
-                    {
-                        FormatCode = new StringValue("General"),
-                        SourceLinked = new BooleanValue(true)
-                    }, new TickLabelPosition()
-                    {
-                        Val = new EnumValue<TickLabelPositionValues>(TickLabelPositionValues.NextTo)
-                    },
-                    new CrossingAxis() {Val = new UInt32Value(48650112U)},
-                    new Crosses() {Val = new EnumValue<CrossesValues>(CrossesValues.AutoZero)},
-                    new CrossBetween() {Val = new EnumValue<CrossBetweenValues>(CrossBetweenValues.Between)}));
+            CreateHistogram(plotArea, stat.Percentiles, 0, 48650112U, 48672768U);
+            CreateCumulative(plotArea, stat.Percentiles, 1, 438381208U, 438380816U);
 
             // Add the chart Legend.
-            Legend legend =
-                chart.AppendChild<Legend>(
-                    new Legend(
-                        new LegendPosition() {Val = new EnumValue<LegendPositionValues>(LegendPositionValues.Right)},
-                        new Layout()));
+            chart.AppendChild(
+                new Legend(
+                    new LegendPosition() {Val = new EnumValue<LegendPositionValues>(LegendPositionValues.Right)},
+                    new Layout()));
 
             chart.Append(new PlotVisibleOnly() {Val = new BooleanValue(true)});
 
@@ -170,6 +68,96 @@ namespace Reporting.Viewers.Xlsx
 
             // Save the WorksheetDrawing object.
             drawingsPart.WorksheetDrawing.Save();
+        }
+
+        private void CreateCumulative(PlotArea plotArea, List<PercentileRecord> percentiles, uint index,
+            uint categoryAxisId, uint valueAxisId)
+        {
+            LineChart lineChart = plotArea.AppendChild<LineChart>(new LineChart(
+                new ShowMarker() {Val = true},
+                new Smooth() {Val = false},
+                new Grouping() {Val = GroupingValues.Standard},
+                new DataLabels(new ShowLegendKey() {Val = false},
+                    new ShowValue() {Val = false},
+                    new ShowCategoryName() {Val = false},
+                    new ShowSeriesName() {Val = false},
+                    new ShowPercent() {Val = false},
+                    new ShowBubbleSize() {Val = false})));
+
+            LineChartSeries lineChartSeries = lineChart.AppendChild(
+                new LineChartSeries(new Index()
+                {
+                    Val = new UInt32Value(index),
+
+                },
+                    new Order() {Val = new UInt32Value(index)},
+                    new SeriesText(new NumericValue() {Text = "Cumulative %"})));
+
+            StringLiteral strLit = lineChartSeries.AppendChild(new CategoryAxisData()).AppendChild(new StringLiteral());
+            strLit.Append(new PointCount() {Val = new UInt32Value((uint) percentiles.Count)});
+
+            NumberLiteral numLit =
+                lineChartSeries.AppendChild(new DocumentFormat.OpenXml.Drawing.Charts.Values())
+                    .AppendChild(new NumberLiteral());
+            numLit.Append(new FormatCode("0.00%"));
+            numLit.Append(new PointCount() {Val = new UInt32Value((uint) percentiles.Count)});
+
+            for (uint i = 0; i < percentiles.Count; i++)
+            {
+                strLit.AppendChild<StringPoint>(new StringPoint() {Index = new UInt32Value(i)})
+                    .Append(new NumericValue(percentiles[(int) i].Value.ToString()));
+                numLit.AppendChild<NumericPoint>(new NumericPoint() {Index = new UInt32Value(i)})
+                    .Append(new NumericValue((percentiles[(int) i].Percentile / 100).ToString()));
+            }
+
+            lineChart.Append(new AxisId() {Val = new UInt32Value(categoryAxisId)});
+            lineChart.Append(new AxisId() {Val = new UInt32Value(valueAxisId)});
+
+            AppendCategoryAxis(plotArea, categoryAxisId, "Time, ms", valueAxisId, false);
+            AppendValueAxis(plotArea, valueAxisId, "", categoryAxisId, AxisPositionValues.Right, TickLabelPositionValues.High, false);
+        }
+
+        private void CreateHistogram(PlotArea plotArea, List<PercentileRecord> percentiles, uint index, uint categoryAxisId, uint valueAxisId)
+        {
+            BarChart barChart =
+                plotArea.AppendChild<BarChart>(
+                    new BarChart(
+                        new BarDirection() {Val = new EnumValue<BarDirectionValues>(BarDirectionValues.Column)},
+                        new BarGrouping() {Val = new EnumValue<BarGroupingValues>(BarGroupingValues.Clustered)},
+                        new VaryColors() {Val = false}
+                        ));
+
+            BarChartSeries barChartSeries = barChart.AppendChild(new BarChartSeries(new Index()
+            {
+                Val = new UInt32Value(index)
+            },
+                new Order() {Val = new UInt32Value(index)},
+                new SeriesText(new NumericValue() {Text = "Histogram"})));
+
+            StringLiteral strLit =
+                barChartSeries.AppendChild<CategoryAxisData>(new CategoryAxisData())
+                    .AppendChild<StringLiteral>(new StringLiteral());
+            strLit.Append(new PointCount() {Val = new UInt32Value((uint) percentiles.Count)});
+
+            NumberLiteral numLit = barChartSeries.AppendChild<DocumentFormat.OpenXml.Drawing.Charts.Values>(
+                new DocumentFormat.OpenXml.Drawing.Charts.Values())
+                .AppendChild<NumberLiteral>(new NumberLiteral());
+            numLit.Append(new FormatCode("General"));
+            numLit.Append(new PointCount() {Val = new UInt32Value((uint) percentiles.Count)});
+
+            for (uint i = 0; i < percentiles.Count; i++)
+            {
+                strLit.AppendChild<StringPoint>(new StringPoint() {Index = new UInt32Value(i)})
+                    .Append(new NumericValue(percentiles[(int) i].Value.ToString()));
+                numLit.AppendChild<NumericPoint>(new NumericPoint() {Index = new UInt32Value(i)})
+                    .Append(new NumericValue(percentiles[(int) i].Count.ToString()));
+            }
+
+            barChart.Append(new AxisId() { Val = new UInt32Value(categoryAxisId) });
+            barChart.Append(new AxisId() { Val = new UInt32Value(valueAxisId) });
+
+            AppendCategoryAxis(plotArea, categoryAxisId, "Time, ms", valueAxisId);
+            AppendValueAxis(plotArea, valueAxisId, "Number of samples", categoryAxisId);
         }
     }
 }

@@ -83,7 +83,7 @@ namespace Reporting.Viewers.Xlsx
             graphicFrame.Append(new DocumentFormat.OpenXml.Drawing.Spreadsheet.NonVisualGraphicFrameProperties(
                 new DocumentFormat.OpenXml.Drawing.Spreadsheet.NonVisualDrawingProperties()
                 {
-                    Id = new UInt32Value(2u),
+                    Id = new UInt32Value(3u),
                     Name = "Chart 1"
                 },
                 new DocumentFormat.OpenXml.Drawing.Spreadsheet.NonVisualGraphicFrameDrawingProperties()));
@@ -98,6 +98,62 @@ namespace Reporting.Viewers.Xlsx
                 }));
 
             twoCellAnchor.Append(new ClientData());
+        }
+
+        protected void AppendValueAxis(PlotArea plotArea, uint id, string name, uint crossingAxisId, AxisPositionValues axisPos = AxisPositionValues.Left, TickLabelPositionValues tickPos = TickLabelPositionValues.NextTo, bool showMajorGridlines = true)
+        {
+            List<OpenXmlElement> elements = GetAxisElements(id, name, crossingAxisId, tickPosition: tickPos);
+
+            elements.Add(new AxisPosition { Val = new EnumValue<AxisPositionValues>(axisPos) });
+            if (showMajorGridlines)
+            {
+                elements.Add(new MajorGridlines());
+            }
+            elements.Add(new DocumentFormat.OpenXml.Drawing.Charts.NumberingFormat()
+            {
+                FormatCode = new StringValue("General"),
+                SourceLinked = new BooleanValue(true)
+            });
+            elements.Add(new CrossBetween { Val = new EnumValue<CrossBetweenValues>(CrossBetweenValues.Between) });
+
+            plotArea.AppendChild(new ValueAxis(elements));
+        }
+
+        protected void AppendCategoryAxis(PlotArea plotArea, uint id, string name, uint crossingAxisId, bool show = true)
+        {
+            List<OpenXmlElement> elements = GetAxisElements(id, name, crossingAxisId, show);
+
+            elements.Add(new AxisPosition { Val = new EnumValue<AxisPositionValues>(AxisPositionValues.Bottom) });
+            elements.Add(new AutoLabeled { Val = new BooleanValue(true) });
+            elements.Add(new LabelAlignment { Val = new EnumValue<LabelAlignmentValues>(LabelAlignmentValues.Center) });
+            elements.Add(new LabelOffset { Val = new UInt16Value((ushort)100) });
+
+            plotArea.AppendChild(new CategoryAxis(elements));
+        }
+
+        private List<OpenXmlElement> GetAxisElements(uint id, String name, uint crossingAxisId, bool show = true, TickLabelPositionValues tickPosition = TickLabelPositionValues.NextTo)
+        {
+            var result = new List<OpenXmlElement>();
+            if (show)
+            {
+                result.Add(new Delete { Val = false });
+            }
+            result.Add(new AxisId { Val = new UInt32Value(id) });
+            result.Add(new Scaling(new Orientation()
+            {
+                Val = new EnumValue<DocumentFormat.OpenXml.Drawing.Charts.OrientationValues>(DocumentFormat.OpenXml.Drawing.Charts.OrientationValues.MinMax)
+            }));
+            if (show)
+            {
+                result.Add(GenerateTitle(name));
+            }
+            result.Add(new TickLabelPosition
+            {
+                Val = new EnumValue<TickLabelPositionValues>(tickPosition)
+            });
+            result.Add(new CrossingAxis { Val = new UInt32Value(crossingAxisId) });
+            result.Add(new Crosses { Val = new EnumValue<CrossesValues>(CrossesValues.AutoZero) });
+            return result;
         }
     }
 }
