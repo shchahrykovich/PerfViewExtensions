@@ -88,6 +88,18 @@ namespace Reporting.Viewers.Xlsx
             return cell;
         }
 
+        protected static Cell CreateCellWithFormula(int rowIndex, int columnIndex, String formula)
+        {
+            Cell cell = new Cell
+            {
+                DataType = CellValues.Number,
+                CellReference = GetColumnName(columnIndex) + rowIndex,
+                CellFormula = new CellFormula(formula)
+            };
+
+            return cell;
+        }
+
         protected static Cell CreateCell(int rowIndex, int columnIndex, int value)
         {
             Cell cell = new Cell

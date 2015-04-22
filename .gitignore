@@ -244,3 +244,5 @@ testSrc/
 PerfViewData.log.txt
 /*.xlsx
 open.bat
+/*.etl.zip
+RunForProduction.bat

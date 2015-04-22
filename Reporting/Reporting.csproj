@@ -89,7 +89,6 @@
     <Compile Include="Viewers\Xlsx\HistogramDataSheet.cs" />
     <Compile Include="Viewers\Xlsx\HistogramSheet.cs" />
     <Compile Include="Viewers\Xlsx\RawDataSheet.cs" />
-    <Compile Include="Viewers\Xlsx\StatSheet.cs" />
     <Compile Include="Viewers\Xlsx\TimelineSheet.cs" />
   </ItemGroup>
   <ItemGroup>

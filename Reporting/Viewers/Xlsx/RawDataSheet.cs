@@ -45,59 +45,5 @@ namespace Reporting.Viewers.Xlsx
 
             return rows;
         }
-
-        //if (i == 0)
-        //{
-        //    row.Append(new Cell
-        //    {
-        //        DataType = CellValues.String,
-        //        CellReference = GetColumnName(4) + rowIndex,
-        //        CellValue = new CellValue("Count")
-        //    });
-
-        //    row.Append(new Cell
-        //    {
-        //        DataType = CellValues.Number,
-        //        CellReference = GetColumnName(5) + rowIndex,
-        //        CellValue = new CellValue(stat.Count.ToString())
-        //    });
-        //}
-
-        //if (i == 1)
-        //{
-        //    row.Append(new Cell
-        //    {
-        //        DataType = CellValues.String,
-        //        CellReference = GetColumnName(4) + rowIndex,
-        //        CellValue = new CellValue("Average")
-        //    });
-
-        //    var average = "=AVERAGE(B2:B" + (stat.Count + 1) + ")";
-        //    row.Append(new Cell
-        //    {
-        //        DataType = CellValues.Number,
-        //        CellReference = GetColumnName(5) + rowIndex,
-        //        CellFormula = new CellFormula(average)
-        //    });
-        //}
-
-        //if (i == 2)
-        //{
-        //    row.Append(new Cell
-        //    {
-        //        DataType = CellValues.String,
-        //        CellReference = GetColumnName(4) + rowIndex,
-        //        CellValue = new CellValue("Median")
-        //    });
-
-        //    var median = "=MEDIAN(B2:B" + (stat.Count + 1) + ")";
-        //    row.Append(new Cell
-        //    {
-        //        DataType = CellValues.Number,
-        //        CellReference = GetColumnName(5) + rowIndex,
-        //        CellFormula = new CellFormula(median)
-        //    });
-        //}
-
     }
 }

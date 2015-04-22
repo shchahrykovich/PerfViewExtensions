@@ -17,6 +17,8 @@ using RunProperties = DocumentFormat.OpenXml.Drawing.RunProperties;
 using Text = DocumentFormat.OpenXml.Drawing.Text;
 using A = DocumentFormat.OpenXml.Drawing;
 
+// ReSharper disable PossiblyMistakenUseOfParamsMethod
+
 namespace Reporting.Viewers.Xlsx
 {
     internal abstract class GraphSheet : BaseSheet
@@ -62,8 +64,7 @@ namespace Reporting.Viewers.Xlsx
 
         protected static void AppendGraphicFrame(DrawingsPart drawingsPart, ChartPart chartPart)
         {
-            TwoCellAnchor twoCellAnchor =
-    drawingsPart.WorksheetDrawing.AppendChild<TwoCellAnchor>(new TwoCellAnchor());
+            TwoCellAnchor twoCellAnchor = drawingsPart.WorksheetDrawing.AppendChild(new TwoCellAnchor());
             twoCellAnchor.Append(new DocumentFormat.OpenXml.Drawing.Spreadsheet.FromMarker(new ColumnId("2"),
                 new ColumnOffset("158233"),
                 new RowId("2"),
