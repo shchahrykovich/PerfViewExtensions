@@ -77,6 +77,7 @@
   <ItemGroup>
     <Compile Include="Commands.cs" />
     <Compile Include="Implementations\DiffRecord.cs" />
+    <Compile Include="Implementations\Frequency.cs" />
     <Compile Include="Viewers\TextWriterViewer.cs" />
     <Compile Include="Viewers\XlsxViewer.cs" />
     <Compile Include="Implementations\Parser.cs" />

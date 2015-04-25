@@ -5,8 +5,8 @@ namespace Reporting.Tests.Implementations
     public class StatsTestResult
     {
         public long TotalCount { get; set; }
-        public long MaxValue { get; set; }
-        public long MinVale { get; set; }
+        public double MaxValue { get; set; }
+        public double MinVale { get; set; }
         public double StdDeviation { get; set; }
 
         private bool Equals(StatsTestResult other)

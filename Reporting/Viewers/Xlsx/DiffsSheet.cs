@@ -17,11 +17,11 @@ namespace Reporting.Viewers.Xlsx
 
         internal override void AddData(Statistics stat)
         {
-            IEnumerable<OpenXmlElement> header = AddHeader("TimeStamp, ms", "Diffs, ms", "", "Name", "Value", "", "Diffs, ms", "Frequency", "Cumulative, %");
+            IEnumerable<OpenXmlElement> header = AddHeader("TimeStamp, ms", "Diffs, ms", "", "Name", "Value", "", "Diffs, ms", "Frequency", "Total Value", "Total Value %", "Total Count", "Total Count %");
             SheetData.Append(header);
 
             IEnumerable<Row> rows = AddDiffs(stat);
-            AddStats(rows);
+            AddStats(rows, stat);
             AddFrequencies(rows, stat);
 
             SheetData.Append(rows);
@@ -29,35 +29,29 @@ namespace Reporting.Viewers.Xlsx
 
         private void AddFrequencies(IEnumerable<Row> rows, Statistics stat)
         {
-            var diffs = stat.Diffs.GroupBy(d => d.Value).OrderBy(d => d.Key).ToArray();
-            for (int i = 0; i < diffs.Length; i++)
+            for (int i = 0; i < stat.Frequencies.Count; i++)
             {
-                var diff = diffs[i];
+                var diff = stat.Frequencies[i];
 
                 var row = rows.ElementAt(i);
-                row.Append(CreateCell((int)row.RowIndex.Value, 7, diff.Key));
-                row.Append(CreateCell((int)row.RowIndex.Value, 8, diff.Count()));
-                if (0 == i)
-                {
-                    row.Append(CreateCellWithFormula((int) row.RowIndex.Value, 9, String.Format("=100 *(G{0} * H{0})/E8", row.RowIndex.Value)));
-                }
-                else
-                {
-                    row.Append(CreateCellWithFormula((int)row.RowIndex.Value, 9, String.Format("=100 *(G{0} * H{0})/E8 + I{1}", row.RowIndex.Value, row.RowIndex.Value - 1)));
-                }
+                row.Append(CreateCell((int)row.RowIndex.Value, 7, diff.Value));
+                row.Append(CreateCell((int)row.RowIndex.Value, 8, diff.Count));
+                row.Append(CreateCell((int)row.RowIndex.Value, 9, diff.TotalValue));
+                row.Append(CreateCell((int)row.RowIndex.Value, 10, diff.TotalValuePercent));
+                row.Append(CreateCell((int)row.RowIndex.Value, 11, diff.TotalCount));
+                row.Append(CreateCell((int)row.RowIndex.Value, 12, diff.TotalCountPercent));
             }
         }
 
-        private void AddStats(IEnumerable<Row> rows)
+        private void AddStats(IEnumerable<Row> rows, Statistics stat)
         {
-            var rowsCount = rows.Count() + OneBasedArray;
-            AddFormula(rows.ElementAt(0), "Count", "=" + rowsCount);
-            AddFormula(rows.ElementAt(1), "Max", "=MAX(B2:B" + rowsCount + ")");
-            AddFormula(rows.ElementAt(2), "Average", "=AVERAGE(B2:B" + rowsCount + ")");
-            AddFormula(rows.ElementAt(3), "Median", "=MEDIAN(B2:B" + rowsCount + ")");
-            AddFormula(rows.ElementAt(4), "Min", "=MIN(B2:B" + rowsCount + ")");
-            AddFormula(rows.ElementAt(5), "StdDeviation", "=STDEVPA(B2:B" + rowsCount + ")");
-            AddFormula(rows.ElementAt(6), "Sum", "=SUM(B2:B" + rowsCount + ")");
+            AddFormula(rows.ElementAt(0), "Count", "=" + stat.TotalCount);
+            AddFormula(rows.ElementAt(1), "Max", "=" + stat.MaxValue);
+            AddFormula(rows.ElementAt(2), "Average", "=" + stat.Average);
+            AddFormula(rows.ElementAt(3), "Median", "=" + stat.Median);
+            AddFormula(rows.ElementAt(4), "Min", "=" + stat.MinValue);
+            AddFormula(rows.ElementAt(5), "StdDeviation", "=" + stat.StdDeviation);
+            AddFormula(rows.ElementAt(6), "Sum", "=" + stat.Sum);
         }
 
         private static void AddFormula(Row row, string name, string formula)

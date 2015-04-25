@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using HdrHistogram.NET;
 using Microsoft.Diagnostics.Tracing;
@@ -28,25 +29,93 @@ namespace Reporting.Implementations
         private Statistics CalculateStatistics()
         {
             Statistics result = new Statistics();
-            result.Diffs = GetDiffs(result);
+            result.Diffs = GetDiffs(result);            
+            if (result.Diffs.Any())
+            {                
+                result.MaxValue = result.Diffs.Max(d => d.Value);
+                result.MinValue = result.Diffs.Min(d => d.Value);
+                result.Median = CalculateMedian(result.Diffs.Select(d => d.Value));
+                result.StdDeviation = CalculateStdDeviation(result.Diffs.Select(d => d.Value));
+                result.TotalCount = result.Diffs.Count;
+                result.Sum = result.Diffs.Sum(d => d.Value);
+                result.Average = result.Diffs.Average(d => d.Value);
+                result.Frequencies = GetFrequencies(result.Diffs);
 
-            HistogramData histogramData = CreateHistogram(result.Diffs);
-            result.MaxValue = histogramData.getMaxValue();
-            result.MinValue = histogramData.getMinValue();
-            result.StdDeviation = histogramData.getStdDeviation();
-            result.TotalCount = histogramData.getTotalCount();
-
-            foreach (var percentile in histogramData.percentiles(5))
-            {
-                PercentileRecord p = new PercentileRecord
+                HistogramData histogramData = CreateHistogram(result.Diffs);
+                foreach (var percentile in histogramData.percentiles(5))
                 {
-                    Value = percentile.getValueIteratedTo(),
-                    Percentile = percentile.getPercentileLevelIteratedTo(),
-                    TotalCount = percentile.getTotalCountToThisValue(),
-                    Count = percentile.getCountAddedInThisIterationStep()
-                };
+                    PercentileRecord p = new PercentileRecord
+                    {
+                        Value = percentile.getValueIteratedTo(),
+                        Percentile = percentile.getPercentileLevelIteratedTo(),
+                        TotalCount = percentile.getTotalCountToThisValue(),
+                        Count = percentile.getCountAddedInThisIterationStep()
+                    };
 
-                result.Percentiles.Add(p);
+                    result.Percentiles.Add(p);
+                }
+            }
+
+            return result;
+        }
+
+        private List<Frequency> GetFrequencies(List<DiffRecord> diffs)
+        {
+            List<Frequency> result = new List<Frequency>();
+
+            double sum = diffs.Sum(d => d.Value);
+            int totalCount = diffs.Count;
+
+            double totalValueCumulative = 0;
+            int totalCountCumulative = 0;
+            foreach (var diff in diffs.GroupBy(d => d.Value).OrderBy(d => d.Key))
+            {
+                var value = diff.Key;
+                var count = diff.Count();
+
+                totalValueCumulative += value * count;
+                totalCountCumulative += count;
+                
+                result.Add(new Frequency
+                {
+                    Value = value,
+                    Count = count,
+                    TotalValue = totalValueCumulative,
+                    TotalValuePercent = 100 * (totalValueCumulative / sum),
+                    TotalCount = totalCountCumulative,
+                    TotalCountPercent = 100 * ((double)totalCountCumulative / totalCount),
+                });
+            }
+            return result;
+        }
+
+        //http://en.wikipedia.org/wiki/Standard_deviation
+        private double CalculateStdDeviation(IEnumerable<double> values)
+        {
+            double[] sorted = values.OrderBy(v => v).ToArray();
+            
+            double average = sorted.Average();
+            double sum = sorted.Sum(v => Math.Pow(v - average, 2));
+            
+            double result = Math.Sqrt(sum / sorted.Length);
+            return result;
+        }
+
+        private double CalculateMedian(IEnumerable<double> diffs)
+        {
+            double result = 0;
+
+            var sorted = diffs.OrderBy(d => d).ToArray();
+
+            var isEven = sorted.Length % 2 == 1;
+            var halfIndex = sorted.Length/2;
+            if (isEven)
+            {
+                result = sorted[halfIndex];
+            }
+            else
+            {
+                result = (sorted[halfIndex - 1] + sorted[halfIndex]) / 2;
             }
 
             return result;
