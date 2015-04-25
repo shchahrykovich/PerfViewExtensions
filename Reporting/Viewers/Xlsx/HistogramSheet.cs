@@ -47,8 +47,8 @@ namespace Reporting.Viewers.Xlsx
             PlotArea plotArea = chart.AppendChild(new PlotArea());
             plotArea.AppendChild(new Layout());
 
-            CreateHistogram(plotArea, stat.Percentiles, 0, 48650112U, 48672768U);
-            CreateCumulative(plotArea, stat.Percentiles, 1, 438381208U, 438380816U);
+            CreateHistogram(plotArea, stat, 0, 48650112U, 48672768U);
+            CreateCumulative(plotArea, stat, 1, 438381208U, 438380816U);
 
             // Add the chart Legend.
             chart.AppendChild(
@@ -70,7 +70,7 @@ namespace Reporting.Viewers.Xlsx
             drawingsPart.WorksheetDrawing.Save();
         }
 
-        private void CreateCumulative(PlotArea plotArea, List<PercentileRecord> percentiles, uint index,
+        private void CreateCumulative(PlotArea plotArea, Statistics stat, uint index,
             uint categoryAxisId, uint valueAxisId)
         {
             LineChart lineChart = plotArea.AppendChild<LineChart>(new LineChart(
@@ -94,20 +94,26 @@ namespace Reporting.Viewers.Xlsx
                     new SeriesText(new NumericValue() {Text = "Cumulative %"})));
 
             StringLiteral strLit = lineChartSeries.AppendChild(new CategoryAxisData()).AppendChild(new StringLiteral());
-            strLit.Append(new PointCount() {Val = new UInt32Value((uint) percentiles.Count)});
+            strLit.Append(new PointCount()
+            {
+                Val = new UInt32Value((uint)stat.Frequencies.Count)
+            });
 
             NumberLiteral numLit =
                 lineChartSeries.AppendChild(new DocumentFormat.OpenXml.Drawing.Charts.Values())
                     .AppendChild(new NumberLiteral());
             numLit.Append(new FormatCode("0.00%"));
-            numLit.Append(new PointCount() {Val = new UInt32Value((uint) percentiles.Count)});
+            numLit.Append(new PointCount()
+            {
+                Val = new UInt32Value((uint)stat.Frequencies.Count)
+            });
 
-            for (uint i = 0; i < percentiles.Count; i++)
+            for (uint i = 0; i < stat.Frequencies.Count; i++)
             {
                 strLit.AppendChild<StringPoint>(new StringPoint() {Index = new UInt32Value(i)})
-                    .Append(new NumericValue(percentiles[(int) i].Value.ToString()));
+                    .Append(new NumericValue(stat.Frequencies[(int)i].Value.ToString()));
                 numLit.AppendChild<NumericPoint>(new NumericPoint() {Index = new UInt32Value(i)})
-                    .Append(new NumericValue((percentiles[(int) i].Percentile / 100).ToString()));
+                    .Append(new NumericValue((stat.Frequencies[(int)i].TotalCountPercent / 100).ToString()));
             }
 
             lineChart.Append(new AxisId() {Val = new UInt32Value(categoryAxisId)});
@@ -117,7 +123,7 @@ namespace Reporting.Viewers.Xlsx
             AppendValueAxis(plotArea, valueAxisId, "", categoryAxisId, AxisPositionValues.Right, TickLabelPositionValues.High, false);
         }
 
-        private void CreateHistogram(PlotArea plotArea, List<PercentileRecord> percentiles, uint index, uint categoryAxisId, uint valueAxisId)
+        private void CreateHistogram(PlotArea plotArea, Statistics stat, uint index, uint categoryAxisId, uint valueAxisId)
         {
             BarChart barChart =
                 plotArea.AppendChild<BarChart>(
@@ -137,20 +143,26 @@ namespace Reporting.Viewers.Xlsx
             StringLiteral strLit =
                 barChartSeries.AppendChild<CategoryAxisData>(new CategoryAxisData())
                     .AppendChild<StringLiteral>(new StringLiteral());
-            strLit.Append(new PointCount() {Val = new UInt32Value((uint) percentiles.Count)});
+            strLit.Append(new PointCount()
+            {
+                Val = new UInt32Value((uint)stat.Frequencies.Count)
+            });
 
             NumberLiteral numLit = barChartSeries.AppendChild<DocumentFormat.OpenXml.Drawing.Charts.Values>(
                 new DocumentFormat.OpenXml.Drawing.Charts.Values())
                 .AppendChild<NumberLiteral>(new NumberLiteral());
             numLit.Append(new FormatCode("General"));
-            numLit.Append(new PointCount() {Val = new UInt32Value((uint) percentiles.Count)});
+            numLit.Append(new PointCount()
+            {
+                Val = new UInt32Value((uint)stat.Frequencies.Count)
+            });
 
-            for (uint i = 0; i < percentiles.Count; i++)
+            for (uint i = 0; i < stat.Frequencies.Count; i++)
             {
                 strLit.AppendChild<StringPoint>(new StringPoint() {Index = new UInt32Value(i)})
-                    .Append(new NumericValue(percentiles[(int) i].Value.ToString()));
+                    .Append(new NumericValue(stat.Frequencies[(int)i].Value.ToString()));
                 numLit.AppendChild<NumericPoint>(new NumericPoint() {Index = new UInt32Value(i)})
-                    .Append(new NumericValue(percentiles[(int) i].Count.ToString()));
+                    .Append(new NumericValue(stat.Frequencies[(int)i].Count.ToString()));
             }
 
             barChart.Append(new AxisId() { Val = new UInt32Value(categoryAxisId) });

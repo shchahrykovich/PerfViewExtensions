@@ -87,7 +87,7 @@ namespace Reporting.Viewers.Xlsx
             barChart.Append(new AxisId() { Val = new UInt32Value(48672768u) });
 
             AppendCategoryAxis(plotArea, 48650112u, "Time, ms", 48672768U);
-            AppendValueAxis(plotArea, 48672768u, "Number of samples", 48650112U);
+            AppendValueAxis(plotArea, 48672768u, "Duration, ms", 48650112U);
 
             // Add the chart Legend.
             Legend legend =
